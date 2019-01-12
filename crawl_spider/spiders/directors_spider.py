@@ -8,8 +8,8 @@ class DirectorsSpiderSpider(scrapy.Spider):
 	name = 'directors_spider'
 
 	custom_settings = {
-	'DEPTH_LIMIT': 2,
-	'DEPTH_PRIORITY': 1       # BPO
+	'DEPTH_LIMIT': 5,         # change the depth level here
+	'DEPTH_PRIORITY': 1       # BPO breadth first operation 
 	}
 
 	allowed_domains = ['zaubacorp.com']
@@ -58,5 +58,6 @@ class DirectorsSpiderSpider(scrapy.Spider):
 				DirectorsSpiderSpider.companies_url_crawled[link] = DirectorsSpiderSpider.companies_url_crawled[response.url] - 1
 				yield scrapy.Request(link, callback=self.parse)
 
+		# sorting to retain director with higher search_depth value
+		DirectorsSpiderSpider.scraped_data = DirectorsSpiderSpider.scraped_data.sort_values('search_depth', ascending=False).drop_duplicates('director_name').sort_index()
 		DirectorsSpiderSpider.scraped_data.to_csv('data/directors.csv')
-		print(DirectorsSpiderSpider.companies_url_crawled)
